@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Role Dashboard System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading.active {
+            display: flex;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="loginSection" class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-md w-96">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Login</h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+                <input type="email" id="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                <input type="password" id="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+            </div>
+            <button onclick="login()" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200">Login</button>
+            <p class="mt-4 text-center text-sm text-gray-600">Don't have an account? <a href="#" onclick="showRegister()" class="text-blue-500 hover:underline">Register</a></p>
+        </div>
+    </div>
+
+    <div id="registerSection" class="min-h-screen flex items-center justify-center hidden">
+        <div class="bg-white p-8 rounded-lg shadow-md w-96">
+            <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Register</h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="regName">Full Name</label>
+                <input type="text" id="regName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="regEmail">Email</label>
+                <input type="email" id="regEmail" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="regPassword">Password</label>
+                <input type="password" id="regPassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+            </div>
+            <button onclick="register()" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200">Register</button>
+            <p class="mt-4 text-center text-sm text-gray-600">Already have an account? <a href="#" onclick="showLogin()" class="text-blue-500 hover:underline">Login</a></p>
+        </div>
+    </div>
+
+    <div id="adminDashboard" class="min-h-screen bg-gray-100 hidden">
+        <div class="flex">
+            <div class="w-64 bg-white shadow-lg h-screen fixed">
+                <div class="p-4">
+                    <h1 class="text-xl font-bold text-gray-800">Admin Dashboard</h1>
+                </div>
+                <nav class="mt-4">
+                    <a href="#" onclick="showAdminPage('tasks')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-list-task mr-2"></i> Tasks
+                    </a>
+                    <a href="#" onclick="showAdminPage('products')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-box mr-2"></i> Products
+                    </a>
+                    <a href="#" onclick="showAdminPage('helpCenter')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-question-circle mr-2"></i> Help Center
+                    </a>
+                    <a href="#" onclick="showAdminPage('employees')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-people mr-2"></i> Employees
+                    </a>
+                    <a href="#" onclick="showAdminPage('users')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-person mr-2"></i> Users
+                    </a>
+                    <a href="#" onclick="showAdminPage('aiSuggestions')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-robot mr-2"></i> AI Suggestions
+                    </a>
+                </nav>
+                <div class="absolute bottom-0 w-full p-4">
+                    <button onclick="logout()" class="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                        <i class="bi bi-box-arrow-right mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+            <div class="ml-64 flex-1 p-8">
+                <div id="adminTasksPage" class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-bold mb-4">Create Task</h3>
+                        <input type="text" id="taskTitle" placeholder="Task Title" class="w-full mb-2 px-3 py-2 border rounded-lg">
+                        <textarea id="taskDescription" placeholder="Task Description" class="w-full mb-2 px-3 py-2 border rounded-lg"></textarea>
+                        <input type="text" id="taskRequirements" placeholder="Requirements" class="w-full mb-2 px-3 py-2 border rounded-lg">
+                        <select id="taskAssignee" class="w-full mb-2 px-3 py-2 border rounded-lg">
+                            <option value="">Select Employee</option>
+                            <option value="employee1">Employee 1</option>
+                            <option value="employee2">Employee 2</option>
+                        </select>
+                        <input type="file" id="taskImage" class="w-full mb-2">
+                        <button onclick="createTask()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Create Task</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-bold mb-4">Task List</h3>
+                        <div id="adminTaskList" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="employeeDashboard" class="min-h-screen bg-gray-100 hidden">
+        <div class="flex">
+            <div class="w-64 bg-white shadow-lg h-screen fixed">
+                <div class="p-4">
+                    <h1 class="text-xl font-bold text-gray-800">Employee Dashboard</h1>
+                </div>
+                <nav class="mt-4">
+                    <a href="#" onclick="showEmployeePage('tasks')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-list-task mr-2"></i> Tasks
+                    </a>
+                    <a href="#" onclick="showEmployeePage('products')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-box mr-2"></i> Products
+                    </a>
+                    <a href="#" onclick="showEmployeePage('helpCenter')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-question-circle mr-2"></i> Help Center
+                    </a>
+                </nav>
+                <div class="absolute bottom-0 w-full p-4">
+                    <button onclick="logout()" class="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                        <i class="bi bi-box-arrow-right mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+            <div class="ml-64 flex-1 p-8">
+                <div id="employeeTasksPage" class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-bold mb-4">Assigned Tasks</h3>
+                        <div id="employeeTaskList" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="userDashboard" class="min-h-screen bg-gray-100 hidden">
+        <div class="flex">
+            <div class="w-64 bg-white shadow-lg h-screen fixed">
+                <div class="p-4">
+                    <h1 class="text-xl font-bold text-gray-800">User Dashboard</h1>
+                </div>
+                <nav class="mt-4">
+                    <a href="#" onclick="showUserPage('issues')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-exclamation-circle mr-2"></i> Issues
+                    </a>
+                    <a href="#" onclick="showUserPage('products')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-box mr-2"></i> Products
+                    </a>
+                    <a href="#" onclick="showUserPage('helpCenter')" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <i class="bi bi-question-circle mr-2"></i> Help Center
+                    </a>
+                </nav>
+                <div class="absolute bottom-0 w-full p-4">
+                    <button onclick="logout()" class="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                        <i class="bi bi-box-arrow-right mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+            <div class="ml-64 flex-1 p-8">
+                <div id="userIssuesPage" class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-bold mb-4">Create Issue</h3>
+                        <input type="text" id="issueTitle" placeholder="Issue Title" class="w-full mb-2 px-3 py-2 border rounded-lg">
+                        <textarea id="issueDescription" placeholder="Issue Description" class="w-full mb-2 px-3 py-2 border rounded-lg"></textarea>
+                        <button onclick="createIssue()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Create Issue</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-bold mb-4">My Issues</h3>
+                        <div id="issueList" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tasks = [];
+        let issues = [];
+
+        function showLogin() {
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('registerSection').classList.add('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registerSection').classList.remove('hidden');
+        }
+
+        function showLoading() {
+            document.querySelector('.loading').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.querySelector('.loading').classList.remove('active');
+        }
+
+        async function login() {
+            showLoading();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            if (email === 'admin@gmail.com' && password === 'admin') {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+            } else if (email === 'employee@gmail.com' && password === 'employee') {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('employeeDashboard').classList.remove('hidden');
+            } else if (email && password) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('userDashboard').classList.remove('hidden');
+            } else {
+                alert('Please enter valid credentials');
+            }
+            hideLoading();
+        }
+
+        async function register() {
+            showLoading();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (name && email && password) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                localStorage.setItem('user', JSON.stringify({name, email, password}));
+
+                alert('Registration successful! Please login.');
+                showLogin();
+            } else {
+                alert('Please fill in all fields');
+            }
+            hideLoading();
+        }
+
+        function logout() {
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('employeeDashboard').classList.add('hidden');
+            document.getElementById('userDashboard').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function createTask() {
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const requirements = document.getElementById('taskRequirements').value;
+            const assignee = document.getElementById('taskAssignee').value;
+
+            if(title && description && requirements && assignee) {
+                const task = {
+                    id: tasks.length + 1,
+                    title,
+                    description,
+                    requirements,
+                    assignee,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
+
+                tasks.push(task);
+                updateTaskLists();
+
+                // Reset form
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskDescription').value = '';
+                document.getElementById('taskRequirements').value = '';
+                document.getElementById('taskAssignee').value = '';
+
+                alert('Task created successfully!');
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        function updateTaskLists() {
+            // Update Admin Task List
+            const adminTaskList = document.getElementById('adminTaskList');
+            adminTaskList.innerHTML = '';
+            tasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'bg-gray-50 p-4 rounded-lg';
+                taskElement.innerHTML = `
+                    <h4 class="font-bold">${task.title}</h4>
+                    <p class="text-gray-600">${task.description}</p>
+                    <p class="text-sm text-gray-500">Assigned to: ${task.assignee}</p>
+                    <p class="text-sm text-gray-500">Status: ${task.status}</p>
+                `;
+                adminTaskList.appendChild(taskElement);
+            });
+
+            // Update Employee Task List
+            const employeeTaskList = document.getElementById('employeeTaskList');
+            employeeTaskList.innerHTML = '';
+            tasks.filter(task => task.status === 'pending').forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'bg-gray-50 p-4 rounded-lg';
+                taskElement.innerHTML = `
+                    <h4 class="font-bold">${task.title}</h4>
+                    <p class="text-gray-600">${task.description}</p>
+                    <p class="text-sm text-gray-500">Requirements: ${task.requirements}</p>
+                    <button onclick="completeTask(${task.id})" class="mt-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                        Mark Complete
+                    </button>
+                `;
+                employeeTaskList.appendChild(taskElement);
+            });
+        }
+
+        function completeTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = 'completed';
+                updateTaskLists();
+                alert('Task marked as completed!');
+            }
+        }
+
+        function createIssue() {
+            const title = document.getElementById('issueTitle').value;
+            const description = document.getElementById('issueDescription').value;
+
+            if(title && description) {
+                const issue = {
+                    id: issues.length + 1,
+                    title,
+                    description,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
+
+                issues.push(issue);
+                updateIssueList();
+
+                // Reset form
+                document.getElementById('issueTitle').value = '';
+                document.getElementById('issueDescription').value = '';
+
+                alert('Issue created successfully!');
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        function updateIssueList() {
+            const issueList = document.getElementById('issueList');
+            issueList.innerHTML = '';
+            issues.forEach(issue => {
+                const issueElement = document.createElement('div');
+                issueElement.className = 'bg-gray-50 p-4 rounded-lg';
+                issueElement.innerHTML = `
+                    <h4 class="font-bold">${issue.title}</h4>
+                    <p class="text-gray-600">${issue.description}</p>
+                    <p class="text-sm text-gray-500">Status: ${issue.status}</p>
+                `;
+                issueList.appendChild(issueElement);
+            });
+        }
+
+        function showAdminPage(page) {
+            alert('Switching to ' + page + ' page');
+        }
+
+        function showEmployeePage(page) {
+            alert('Switching to ' + page + ' page');
+        }
+
+        function showUserPage(page) {
+            alert('Switching to ' + page + ' page');
+        }
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
